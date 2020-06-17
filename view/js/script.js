@@ -26,6 +26,20 @@ async function sendRequest(){
       let res = await fetch(`https://jsonmock.hackerrank.com/api/medical_records?userId=${ID}`)
       if(res.ok){
         userDetails = await res.json()
+        console.log(userDetails)
+        rangeDates = []
+        userDetails.data.forEach((item)=>{
+          rangeDates.push(item.timestamp)
+        })
+        rangeDates.sort()
+        rangeDates.reverse()
+        userDetailsData = []
+        rangeDates.forEach(item=>{
+          itemToPush = userDetails.data.find(date=>date.timestamp === item)
+          userDetailsData.push(itemToPush)
+        })
+        userDetails.data = userDetailsData
+
         //loader and btn deactivate
         loader.style.display = 'none'
         btn.removeAttribute('disabled')
