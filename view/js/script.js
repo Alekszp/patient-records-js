@@ -1,4 +1,3 @@
-
 const headers = ['SL', 'Date', 'Diagnosis', 'Weight', 'Doctor'];
 
 const btn = document.getElementById('submit-btn')
@@ -13,64 +12,69 @@ const tableBody = document.getElementById('table-body')
 
 let userDetails = []
 
-async function sendRequest(){
-    let sel = document.getElementById('patient-select')
-    let ID = +sel.options[sel.selectedIndex].value
-    if(ID !== -1){
-      //loader and btn
-      btn.setAttribute('disabled', true)
-      btn.classList.add('disabled')
-      loader.style.display = 'block'
-      //
+async function sendRequest() {
+  userDetails = []
+  let sel = document.getElementById('patient-select')
+  let ID = +sel.options[sel.selectedIndex].value
+  if (ID !== -1) {
+    //loader and btn
+    btn.setAttribute('disabled', true)
+    btn.classList.add('disabled')
+    loader.style.display = 'block'
+    //
 
-      let res = await fetch(`https://jsonmock.hackerrank.com/api/medical_records?userId=${ID}`)
-      if(res.ok){
-        userDetails = await res.json()
-        console.log(userDetails)
-        rangeDates = []
-        userDetails.data.forEach((item)=>{
-          rangeDates.push(item.timestamp)
-        })
-        rangeDates.sort()
-        rangeDates.reverse()
-        userDetailsData = []
-        rangeDates.forEach(item=>{
-          itemToPush = userDetails.data.find(date=>date.timestamp === item)
-          userDetailsData.push(itemToPush)
-        })
-        userDetails.data = userDetailsData
+    let res = await fetch(`https://jsonmock.hackerrank.com/api/medical_records?userId=${ID}`)
+    if (res.ok) {
+      userDetails = await res.json()
 
-        //loader and btn deactivate
-        loader.style.display = 'none'
-        btn.removeAttribute('disabled')
-        btn.classList.remove('disabled')
+      sortByDates()
 
-        //remove old table and create new
-        tableHeader.innerHTML = ''
-        tableBody.innerHTML = ''
-        createUserSummary()
-        createTable()
-      }
-    }    
+      //loader and btn deactivate
+      loader.style.display = 'none'
+      btn.removeAttribute('disabled')
+      btn.classList.remove('disabled')
+
+      //remove old table and create new
+      tableHeader.innerHTML = ''
+      tableBody.innerHTML = ''
+      createUserSummary()
+      createTable()
+    }
+  }
 }
 
-function createUserSummary(){
+function sortByDates() {
+  let sortedDates = []
+  userDetails.data.forEach((item) => {
+    sortedDates.push(item.timestamp)
+  })
+  sortedDates.sort()
+  sortedDates.reverse()
+  userDetailsData = []
+  sortedDates.forEach(item => {
+    itemToPush = userDetails.data.find(date => date.timestamp === item)
+    userDetailsData.push(itemToPush)
+  })
+  userDetails.data = userDetailsData
+}
+
+function createUserSummary() {
   patientName.innerHTML = userDetails.data[0].userName
   patientDob.innerHTML = userDetails.data[0].userDob
   patientHeight.innerHTML = `Height: ${userDetails.data[0].meta.height} sm`
 }
 
-function createTable(){
+function createTable() {
   // add table header
   tableHeader.insertRow()
-  headers.forEach(columnName=>{
+  headers.forEach(columnName => {
     let th = document.createElement('th')
     th.innerText = columnName
     tableHeader.lastChild.appendChild(th)
   })
 
   // add table body
-  userDetails.data.forEach((row,i)=>{
+  userDetails.data.forEach((row, i) => {
     tableBody.insertRow()
     let tdSL = document.createElement('td')
     let tdDate = document.createElement('td')
